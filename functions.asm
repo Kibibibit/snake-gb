@@ -35,7 +35,7 @@ Memclr:
 .MemclrLoop:
     ld [hli], a
     dec bc
-    jp nz .MemclrLoop
+    jp nz, .MemclrLoop
     ret
 
 ; FUNCTION: ClearOAM
