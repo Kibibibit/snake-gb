@@ -31,10 +31,12 @@ Memcpy:
 ; @param bc: Length
 ; @param hl: Pointer to destination
 Memclr:
-    ld a, $00
+    ld a, 0
 .MemclrLoop:
     ld [hli], a
     dec bc
+    ld a, b
+    or a, c
     jp nz, .MemclrLoop
     ret
 

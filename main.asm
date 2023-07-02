@@ -30,11 +30,8 @@ AwaitVBlank:
     ld bc, PlayerTilesEnd - PlayerTiles
     call Memcpy
 
-
-
     ; Once tile copying is done, clear junk from the OAM
     call ClearOAM
-
 
     ; Enable LCD
     ld a, LCDCF_ON | LCDCF_BGON
@@ -47,8 +44,7 @@ AwaitVBlank:
     ldh [rIF], a      ; We want to set rIF to 0 otherwise interrupts might activate prematurely
     ei                ; Enable interrupts
 
-
-
+    
 
 ; infinite loop till I work out what I'm doing
 MainLoop:
