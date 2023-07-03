@@ -48,6 +48,29 @@ AwaitVBlank:
     ld hl, wOAMStagingPoint
     call Memclr
 
+    ; Load in a test palette
+    ld a, %10000000
+    ldh [rOCPS], a
+    ; Learn to do this properly
+    ld a, $FF
+    ldh [rOCPD], a
+    ldh [rOCPD], a
+    ld bc, %0000001111100000
+    ld a, LOW(bc)
+    ldh [rOCPD], a
+    ld a, HIGH(bc)
+    ldh [rOCPD], a
+    ld bc, %0000000011100000
+    ld a, LOW(bc)
+    ldh [rOCPD], a
+    ld a, HIGH(bc)
+    ldh [rOCPD], a
+    ld bc, %0000000000100000
+    ld a, LOW(bc)
+    ldh [rOCPD], a
+    ld a, HIGH(bc)
+    ldh [rOCPD], a
+
     ; Load in a test srpite
 
     ld a, 40
@@ -57,7 +80,7 @@ AwaitVBlank:
     ld [wOAMStagingPoint+2], a
 
     ; Enable LCD
-    ld a, LCDCF_ON | LCDCF_BGON
+    ld a, LCDCF_ON | LCDCF_BGON | LCDCF_OBJON
     ld [rLCDC], a
 
     ; Now that we have the data loaded, we want to enable vblank interrupts
