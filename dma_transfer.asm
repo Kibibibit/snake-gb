@@ -2,7 +2,7 @@ SECTION "DMA Transfer", ROM0
 
 ; FUNCTOIN: CopyDMARoutine
 ;
-; Copies the DMA routine into HRAM
+; Copies the DMA routine into HRAM, as we can't initiate a DMA transfer from ROM
 ;
 ; MODIFIES:
 ;

@@ -32,7 +32,7 @@ AwaitVBlank:
 
     ; Start copying tiles into vram
     ld de, PlayerTiles
-    ld hl, $8010 ; So the background doesn't get overwritten, set $9010 (second tile) instead of $9000
+    ld hl, $8000 ; Change this to background tiles once game logic is working
     ld bc, PlayerTilesEnd - PlayerTiles
     call Memcpy
 
@@ -56,11 +56,10 @@ AwaitVBlank:
     call WriteObjectPalettes
 
     ; Load in a test srpite
-
     ld a, 40
     ld [wOAMStagingPoint], a
     ld [wOAMStagingPoint+1], a
-    ld a, $1
+    ld a, 0
     ld [wOAMStagingPoint+2], a
 
     ; Tell the vblank interrupt that we want to do a DMA transfer
