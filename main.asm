@@ -6,6 +6,7 @@ INCLUDE "dma_transfer.asm"
 INCLUDE "graphics.asm"
 INCLUDE "registers.asm"
 INCLUDE "level_data.asm"
+INCLUDE "player.asm"
 
 SECTION "Header", ROM0[$100]
     ; Make space for the nintendo header
@@ -65,6 +66,8 @@ AwaitVBlank:
     ld de, BgPalettes
     ld bc, BgPalettesEnd-BgPalettes
     call WriteBgPalettes
+
+    call InitPlayer
 
     ; Tell the vblank interrupt that we want to do a DMA transfer
     ld a, regDMAWrite

@@ -54,7 +54,7 @@ SnakeTiles:
 SnakeTilesEnd:
 
 BgPalettes:
-    db $00,$00, $00,$00, $00,$00, $00,$00,
-    db $FF,$FF, $E0,$03, $A0,$02, $00,$01,
+    db $00,$00, $E0,$03, $A0,$02, $00,$01,
+    db $00,$00, $FF,$FF, $88,$88, $BB,$BB,
     db $FF,$FF, $6B,$2D, $63,$0C, $00,$00, 
 BgPalettesEnd:

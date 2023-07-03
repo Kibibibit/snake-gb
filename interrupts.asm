@@ -19,7 +19,14 @@ VBlankHandler:
     and a, b
     jp z, .skipDMA
     call DMATransfer
-    .skipDMA
+.skipDMA
+
+    ; ld a, [wButtonsPressed]
+    ; ld b, %10000000
+    ; and a, b
+    ; jp z, .skipUp
+    call MovePlayerDow
+.skipDown
 
 
     ; Once the interrupt is done, we can go back to doing whatever it was before
