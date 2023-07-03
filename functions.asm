@@ -20,6 +20,17 @@ Memcpy:
     jp nz, Memcpy ; If `a | c` (effectively `b` | `c`) is not zero, loop
     ret           ; Otherwise, return
 
+; FUNCTION: Memset
+;
+; Sets a range of bytes to the value pointed to by `de`
+;
+; MODIFIES:
+;
+; `a`, `bc`, `de`
+;
+; @param de: Pointer to source
+; @param bc: Length
+; @param hl: Pointer to destination
 Memset:
     ld a, [de]
     ld [hli], a

@@ -3,6 +3,7 @@ INCLUDE "interrupts.asm"
 INCLUDE "functions.asm"
 INCLUDE "inputs.asm"
 INCLUDE "dma_transfer.asm"
+INCLUDE "graphics.asm"
 
 SECTION "Header", ROM0[$100]
     ; Make space for the nintendo header
@@ -48,28 +49,10 @@ AwaitVBlank:
     ld hl, wOAMStagingPoint
     call Memclr
 
-    ; Load in a test palette
-    ld a, %10000000
-    ldh [rOCPS], a
-    ; Learn to do this properly
-    ld a, $FF
-    ldh [rOCPD], a
-    ldh [rOCPD], a
-    ld bc, %0000001111100000
-    ld a, LOW(bc)
-    ldh [rOCPD], a
-    ld a, HIGH(bc)
-    ldh [rOCPD], a
-    ld bc, %0000000011100000
-    ld a, LOW(bc)
-    ldh [rOCPD], a
-    ld a, HIGH(bc)
-    ldh [rOCPD], a
-    ld bc, %0000000000100000
-    ld a, LOW(bc)
-    ldh [rOCPD], a
-    ld a, HIGH(bc)
-    ldh [rOCPD], a
+    ; Load in palettes
+    ld de, ObjectPalettes
+    ld bc, ObjectPalettesEnd-ObjectPalettes
+    call WriteObjectPalettes
 
     ; Load in a test srpite
 
@@ -97,10 +80,3 @@ MainLoop:
     call ReadJoypad ; Read joypad inputs
     halt
     jp MainLoop
-
-
-SECTION "Graphics", ROM0
-
-PlayerTiles:
-    incbin "player-tiles.bin"
-PlayerTilesEnd:
