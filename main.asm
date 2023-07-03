@@ -5,6 +5,7 @@ INCLUDE "inputs.asm"
 INCLUDE "dma_transfer.asm"
 INCLUDE "graphics.asm"
 INCLUDE "registers.asm"
+INCLUDE "level_data.asm"
 
 SECTION "Header", ROM0[$100]
     ; Make space for the nintendo header
@@ -31,15 +32,10 @@ AwaitVBlank:
     ld [rLCDC], a
 
     ; Start copying tiles into vram
-    ld de, PlayerTiles
-    ld hl, $8000 ; Change this to background tiles once game logic is working
-    ld bc, PlayerTilesEnd - PlayerTiles
+    ld de, SnakeTiles
+    ld hl, $9010 ; Change this to background tiles once game logic is working
+    ld bc, SnakeTilesEnd - SnakeTiles
     call Memcpy
-
-    ld de, $9800
-    ld hl, $9800
-    ld bc, $9BFF-$9800
-    call Memset
 
     ; Once tile copying is done, clear junk from the OAM
     ld bc, $00A0 ; OAM memory is 160 bytes long
@@ -50,17 +46,25 @@ AwaitVBlank:
     ld hl, wOAMStagingPoint
     call Memclr
 
-    ; Load in palettes
-    ld de, ObjectPalettes
-    ld bc, ObjectPalettesEnd-ObjectPalettes
-    call WriteObjectPalettes
+    ld de, LevelData
+    ld hl, $9800
+    ld bc, LevelDataEnd - LevelData
+    call Memcpy
 
-    ; Load in a test srpite
-    ld a, 40
-    ld [wOAMStagingPoint], a
-    ld [wOAMStagingPoint+1], a
+    ld a, 1
+    ldh [rVBK], a
+    ld de, AttributeData
+    ld hl, $9800
+    ld bc, AttributeDataEnd - AttributeData
+    call Memcpy
+
     ld a, 0
-    ld [wOAMStagingPoint+2], a
+    ldh [rVBK], a
+
+    ; Load in palettes
+    ld de, BgPalettes
+    ld bc, BgPalettesEnd-BgPalettes
+    call WriteBgPalettes
 
     ; Tell the vblank interrupt that we want to do a DMA transfer
     ld a, regDMAWrite

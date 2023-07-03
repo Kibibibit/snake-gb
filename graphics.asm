@@ -49,10 +49,12 @@ WriteBgPalettes:
 
 SECTION "Graphics", ROM0
 
-PlayerTiles:
-    incbin "player-tiles.bin"
-PlayerTilesEnd:
+SnakeTiles:
+    incbin "snake-tiles.bin"
+SnakeTilesEnd:
 
-ObjectPalettes:
+BgPalettes:
+    db $00,$00, $00,$00, $00,$00, $00,$00,
     db $FF,$FF, $E0,$03, $A0,$02, $00,$01,
-ObjectPalettesEnd:
+    db $FF,$FF, $6B,$2D, $63,$0C, $00,$00, 
+BgPalettesEnd:
