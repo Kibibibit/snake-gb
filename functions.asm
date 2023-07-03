@@ -20,6 +20,15 @@ Memcpy:
     jp nz, Memcpy ; If `a | c` (effectively `b` | `c`) is not zero, loop
     ret           ; Otherwise, return
 
+Memset:
+    ld a, [de]
+    ld [hli], a
+    dec bc
+    ld a, b
+    or a, c
+    jp nz, Memset
+    ret
+
 ;FUNCTION: Memclr
 ;
 ; Clears a group of bytes to 0
@@ -31,24 +40,10 @@ Memcpy:
 ; @param bc: Length
 ; @param hl: Pointer to destination
 Memclr:
-    ld a, 0
-.MemclrLoop:
+    ld a, $0
     ld [hli], a
     dec bc
     ld a, b
     or a, c
-    jp nz, .MemclrLoop
-    ret
-
-; FUNCTION: ClearOAM
-;
-; Clears out the OAM memory as it is filled with garbage on boot
-;
-; MODIFIES
-;
-; `a`, `bc`, `hl`
-ClearOAM:
-    ld bc, $00A0 ; OAM memory is 160 bytes long
-    ld hl, _OAMRAM
-    call Memclr
+    jp nz, Memclr
     ret

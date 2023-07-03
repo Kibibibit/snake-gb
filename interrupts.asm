@@ -13,6 +13,9 @@ SECTION "VBlank Handler", ROM0
 VBlankHandler:
     ; We can write code that accesses VRAM here cause it's not being used at the moment
 
+    ; Start a DMA transfer here if the right flag in WRAM is set
+    call DMATransfer
+
 
     ; Once the interrupt is done, we can go back to doing whatever it was before
     pop hl
