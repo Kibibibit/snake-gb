@@ -14,7 +14,12 @@ VBlankHandler:
     ; We can write code that accesses VRAM here cause it's not being used at the moment
 
     ; Start a DMA transfer here if the right flag in WRAM is set
+    ld a, [wVBlankFlags]
+    ld b, regDMAWrite
+    and a, b
+    jp z, .skipDMA
     call DMATransfer
+    .skipDMA
 
 
     ; Once the interrupt is done, we can go back to doing whatever it was before

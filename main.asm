@@ -4,6 +4,7 @@ INCLUDE "functions.asm"
 INCLUDE "inputs.asm"
 INCLUDE "dma_transfer.asm"
 INCLUDE "graphics.asm"
+INCLUDE "registers.asm"
 
 SECTION "Header", ROM0[$100]
     ; Make space for the nintendo header
@@ -61,6 +62,10 @@ AwaitVBlank:
     ld [wOAMStagingPoint+1], a
     ld a, $1
     ld [wOAMStagingPoint+2], a
+
+    ; Tell the vblank interrupt that we want to do a DMA transfer
+    ld a, regDMAWrite
+    ld [wVBlankFlags], a
 
     ; Enable LCD
     ld a, LCDCF_ON | LCDCF_BGON | LCDCF_OBJON
