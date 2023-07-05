@@ -20,14 +20,42 @@ VBlankHandler:
     jp z, .skipDMA
     call DMATransfer
 .skipDMA
+    ld a, [wPlayerTimer]
+    add a, 1
+    ld b, 10
+    cp a, b
 
-    ; ld a, [wButtonsPressed]
-    ; ld b, %10000000
-    ; and a, b
-    ; jp z, .skipUp
-    call MovePlayerDow
+    jr z, .startMove
+    jr .skipMove
+.startMove
+    ld a, 0
+    ld [wPlayerTimer], a
+
+.move
+    ld a, [wButtonsHeld]
+    ld b, %10000000
+    and a, b
+    cp a, b
+    jp nz, .skipDown
+    call MovePlayerDown
+    jr .doneMove
 .skipDown
+    ld a, [wButtonsHeld]
+    ld b, %01000000
+    and a, b
+    cp a, b
+    jp nz, .skipUp
+    call MovePlayerUp
+    jr .doneMove
+.skipUp
 
+    jr .doneMove
+
+
+
+.skipMove
+    ld [wPlayerTimer], a
+.doneMove
 
     ; Once the interrupt is done, we can go back to doing whatever it was before
     pop hl

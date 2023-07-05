@@ -58,3 +58,31 @@ Memclr:
     or a, c
     jp nz, Memclr
     ret
+
+;FUNCTION: Add8To16
+;
+; Adds an 8 bit value to a 16 bit value
+;
+; MODIFIES:
+;
+; `a`, `hl`
+;
+; @param a:  8 bit value
+; @param hl: 16 bit value
+Add8To16:
+    add a, l
+    ld  l, a
+    adc a, h ;Add h to a, including a carry flag
+    sub l
+    ld  h, a
+    ret
+
+Sub8From16:
+    cpl 
+    scf 
+    adc a, l
+    ld  l, a
+    ld  a, -1
+    adc a, h
+    ld  h, a
+    ret
