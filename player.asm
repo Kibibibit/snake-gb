@@ -101,9 +101,7 @@ MovePlayerUp:
 MovePlayerLeft:
     call    MovePlayerStart
 
-    ld      a, $1
-
-    call    Sub8From16
+    dec     hl
 
     ld      a, l
     and     a, $1F ; This is the value we need to check
