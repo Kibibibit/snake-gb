@@ -19,6 +19,16 @@ VBlankHandler:
     and a, b
     jp z, .skipDMA
     call DMATransfer
+    ; Disable the flag so it's not called next cycle
+    ld a, [wVBlankFlags]
+    ld c, a ; Store flags for later
+    ld b, regDMAWrite
+    and a, b ; Get specifically the bit with the flag set
+    ld  b, a ; store for later
+    ld  a, c ; restore the proper flags
+    sub a, b ; subtract the set bit
+    ld [wVBlankFlags], a
+    
 .skipDMA
     ld a, [wPlayerTimer]
     add a, 1

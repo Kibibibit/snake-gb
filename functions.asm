@@ -67,8 +67,12 @@ Memclr:
 ;
 ; `a`, `hl`
 ;
+; Effectively `hl` + `a`
+;
 ; @param a:  8 bit value
 ; @param hl: 16 bit value
+;
+; Stores the result in `hl`
 Add8To16:
     add a, l
     ld  l, a
@@ -77,6 +81,20 @@ Add8To16:
     ld  h, a
     ret
 
+;FUNCTION: Sub8From16
+;
+; Subtracts an 8 bit value from a 16 bit value
+;
+; Effectively `hl` - `a`
+;
+; MODIFIES:
+;
+; `a`, `hl`
+;
+; @param a:  8 bit value
+; @param hl: 16 bit value
+;
+; Stores the result in `hl`
 Sub8From16:
     cpl 
     scf 
@@ -85,4 +103,34 @@ Sub8From16:
     ld  a, -1
     adc a, h
     ld  h, a
+    ret
+
+;FUNCTION: Gt16
+;
+; Checks if one 16 bit value is greater than another 16 bit value
+;
+; MODIFIES:
+;
+; `a`, `b`, `de`, `hl`
+;
+; Stores the result in the `a` flag, `1` means true, `0` means false
+Gt16:
+    ld a, d 
+    ld b, h
+
+    cp a, b
+    jr c, .gt16true ; if b > a 
+    jr nz, .gt16false ; if b != a, but it's not greater, then jump to false
+
+    ld a, e
+    ld b, l
+    cp a, b
+    jr c, .gt16true ; if b > a
+    jr nz, .gt16false ; if b != a
+
+.gt16true
+    ld a, 1
+    ret
+.gt16false
+    ld a, 0
     ret

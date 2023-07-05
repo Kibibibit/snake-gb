@@ -35,19 +35,11 @@ MovePlayerDown:
     call Add8To16
 
     ld de, $9A20
-    ; start by checking the upper bit
-    ld a, d 
-    ld b, h
+    call Gt16
+    cp a, 1
+    jr z, .downTrue
+    jr .downFalse
 
-    cp a, b
-    jr c, .downTrue ; if b > a 
-    jr nz, .downFalse ; if b != a, but it's not greater, then jump to false
-
-    ld a, e
-    ld b, l
-    cp a, b
-    jr c, .downTrue ; if b > a
-    jr nz, .downFalse ; if b != a
 .downTrue
     ld  a, l ; save the column
     and a, $1F
@@ -77,17 +69,18 @@ MovePlayerUp:
     call Sub8From16
 
     ld de, $9833
+    ld b, h ; Load HL into BC to save it
+    ld c, l
+    ld h, d ; Load DE into HL
+    ld l, e
+    ld d, b ; Load old HL into DE
+    ld e, c
 
-    ld b, d
-    ld a, h
-    cp a, b
-    jr c, .upTrue
-    jr nz, .upFalse
-
-    ld b, e
-    ld a, l
-    cp a, b
-    jr c, .upTrue
+    call Gt16
+    ld h, d
+    ld l, e
+    cp a, 1
+    jr z, .upTrue
     jr .upFalse
 .upTrue
     ld a, l
@@ -110,3 +103,4 @@ MovePlayerUp:
 SECTION "Player Variables", WRAM0
 wPlayerPos: ds 2
 wPlayerTimer: db
+wPlayerDirections: db
