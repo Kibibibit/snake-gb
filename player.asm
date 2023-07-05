@@ -35,19 +35,19 @@ MovePlayerDown:
     call Add8To16
 
     ld de, $9A20
-
-    ld a, d
+    ; start by checking the upper bit
+    ld a, d 
     ld b, h
 
     cp a, b
-    jr c, .downTrue ; if 0xXX00 > 0xXX00 
-    jr nz, .downFalse ; if 0xXX00 != 0xXX00, but it's not greater, then jump to false
+    jr c, .downTrue ; if b > a 
+    jr nz, .downFalse ; if b != a, but it's not greater, then jump to false
 
     ld a, e
     ld b, l
     cp a, b
-    jr c, .downTrue ; if 0x00XX > 0x00XX
-    jr nz, .downFalse ; if 0x00XX != 0x00XX
+    jr c, .downTrue ; if b > a
+    jr nz, .downFalse ; if b != a
 .downTrue
     ld  a, l ; save the column
     and a, $1F
