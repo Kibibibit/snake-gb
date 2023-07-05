@@ -37,7 +37,7 @@ VBlankHandler:
     jr      z, .startMove
     jr      .skipMove
 .startMove
-    xor     a, a
+    xor     a, a ; Faster than ld a, 0
     ld      [wPlayerTimer], a
 
 .move
