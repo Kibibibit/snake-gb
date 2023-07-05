@@ -8,15 +8,15 @@ SECTION "DMA Transfer", ROM0
 ;
 ; `a`, `bc`, hl`
 CopyDMARoutine:
-    ld hl, DMATransfer ;Our starting address
-    ld b, DMATransferEnd - DMATransfer ;How many bytes
-    ld c, LOW(hDMARoutine) ;The low byte of the destination address, as we can't control the high byte
+    ld      hl, DMATransfer ;Our starting address
+    ld      b, DMATransferEnd - DMATransfer ;How many bytes
+    ld      c, LOW(hDMARoutine) ;The low byte of the destination address, as we can't control the high byte
 .copyDMA
-    ld a, [hli]
-    ldh [c], a
-    inc c
-    dec b
-    jr nz, .copyDMA
+    ld      a, [hli]
+    ldh     [c], a
+    inc     c
+    dec     b
+    jr      nz, .copyDMA
     ret
 
 ; FUNCTION: DMATransfer
@@ -28,17 +28,19 @@ CopyDMARoutine:
 ;
 ; `a`
 DMATransfer:
-    ld a, $C1
-    ld [rDMA], a
-    ld a, $28       ; We want to delay for 40 cycles
+    ld      a, $C1
+    ld      [rDMA], a
+    ld      a, $28       ; We want to delay for 40 cycles
 .waitDMA
-    dec a           ; 1 cycle
-    jr nz, .waitDMA ; 3 cycles
+    dec     a            ; 1 cycle
+    jr      nz, .waitDMA ; 3 cycles
     ret
 DMATransferEnd:
 
 SECTION "DMA Variables", WRAM0[$C100]
-wOAMStagingPoint: ds $a0
+wOAMStagingPoint: 
+    ds      $a0
 
 SECTION "DMA In HRAM", HRAM
-hDMARoutine:ds DMATransferEnd - DMATransfer
+hDMARoutine:
+    ds      DMATransferEnd - DMATransfer

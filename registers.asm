@@ -1,5 +1,6 @@
 DEF regDMAWrite EQU $01
 
 SECTION "Registers", WRAM0
-wVBlankFlags: ds 1
+wVBlankFlags: 
+    ds      1
 

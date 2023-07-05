@@ -11,14 +11,14 @@ SECTION "Functions", ROM0
 ; @param bc: Length
 ; @param hl: Pointer to destination
 Memcpy:
-    ld a, [de]    ; Set `a` to the value pointed at by `de`
-    ld [hli], a   ; Set the value at `hl` to `a`, and then increment
-    inc de        ; Move to next value
-    dec bc        ; Decrement the amount of values left
-    ld a, b       ; Move `b` into `a` so we can compare `b` and `c`
-    or a, c       ; Compare `a` and `c`
-    jp nz, Memcpy ; If `a | c` (effectively `b` | `c`) is not zero, loop
-    ret           ; Otherwise, return
+    ld      a, [de]    ; Set `a` to the value pointed at by `de`
+    ld      [hli], a   ; Set the value at `hl` to `a`, and then increment
+    inc     de         ; Move to next value
+    dec     bc         ; Decrement the amount of values left
+    ld      a, b       ; Move `b` into `a` so we can compare `b` and `c`
+    or      a, c       ; Compare `a` and `c`
+    jp      nz, Memcpy ; If `a | c` (effectively `b` | `c`) is not zero, loop
+    ret                ; Otherwise, return
 
 ; FUNCTION: Memset
 ;
@@ -32,12 +32,12 @@ Memcpy:
 ; @param bc: Length
 ; @param hl: Pointer to destination
 Memset:
-    ld a, [de]
-    ld [hli], a
-    dec bc
-    ld a, b
-    or a, c
-    jp nz, Memset
+    ld      a, [de]
+    ld      [hli], a
+    dec     bc
+    ld      a, b
+    or      a, c
+    jp      nz, Memset
     ret
 
 ;FUNCTION: Memclr
@@ -51,12 +51,12 @@ Memset:
 ; @param bc: Length
 ; @param hl: Pointer to destination
 Memclr:
-    ld a, $0
-    ld [hli], a
-    dec bc
-    ld a, b
-    or a, c
-    jp nz, Memclr
+    ld      a, $0
+    ld      [hli], a
+    dec     bc
+    ld      a, b
+    or      a, c
+    jp      nz, Memclr
     ret
 
 ;FUNCTION: Add8To16
@@ -74,11 +74,11 @@ Memclr:
 ;
 ; Stores the result in `hl`
 Add8To16:
-    add a, l
-    ld  l, a
-    adc a, h ;Add h to a, including a carry flag
-    sub l
-    ld  h, a
+    add     a, l
+    ld      l, a
+    adc     a, h ;Add h to a, including a carry flag
+    sub     l
+    ld      h, a
     ret
 
 ;FUNCTION: Sub8From16
@@ -98,11 +98,11 @@ Add8To16:
 Sub8From16:
     cpl 
     scf 
-    adc a, l
-    ld  l, a
-    ld  a, -1
-    adc a, h
-    ld  h, a
+    adc     a, l
+    ld      l, a
+    ld      a, -1
+    adc     a, h
+    ld      h, a
     ret
 
 ;FUNCTION: Gt16
@@ -115,22 +115,22 @@ Sub8From16:
 ;
 ; Stores the result in the `a` flag, `1` means true, `0` means false
 Gt16:
-    ld a, d 
-    ld b, h
+    ld      a, d 
+    ld      b, h
 
-    cp a, b
-    jr c, .gt16true ; if b > a 
-    jr nz, .gt16false ; if b != a, but it's not greater, then jump to false
+    cp      a, b
+    jr      c, .gt16true   ; if b > a 
+    jr      nz, .gt16false ; if b != a, but it's not greater, then jump to false
 
-    ld a, e
-    ld b, l
-    cp a, b
-    jr c, .gt16true ; if b > a
-    jr nz, .gt16false ; if b != a
+    ld      a, e
+    ld      b, l
+    cp      a, b
+    jr      c, .gt16true   ; if b > a
+    jr      nz, .gt16false ; if b != a
 
 .gt16true
-    ld a, 1
+    ld      a, 1
     ret
 .gt16false
-    ld a, 0
+    xor     a, a
     ret
