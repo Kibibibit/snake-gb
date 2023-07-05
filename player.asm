@@ -119,11 +119,45 @@ MovePlayerLeft:
     ld      a, 1
     ld      [rVBK], a
     ld      a, [hl]
-    and     a, $7F
+    and     a, $DF
     ld      [hl], a
     xor     a, a
     ld      [rVBK], a
     ret
+
+MovePlayerRight:
+    call    MovePlayerStart
+
+    inc     hl
+
+    ld      a, l
+    and     a, $1F
+    cp      a, $12
+    jr      nc, .rightTrue
+    jr      .rightFalse
+.rightTrue
+    ; Wrapping is being set wrong
+    ld      a, l
+    or      a, $E0
+    ld      l, a
+    ld      a, $01
+    or      a, l
+    ld      l, a
+
+.rightFalse
+
+    ld      b, 1
+    call    MovePlayerEnd
+
+    ld      a, 1
+    ld      [rVBK], a
+    ld      a, [hl]
+    or      a, $20
+    ld      [hl], a
+    xor     a, a
+    ld      [rVBK], a
+    ret
+
 
 SECTION "Player Variables", WRAM0
 wPlayerPos: 

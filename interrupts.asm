@@ -61,7 +61,7 @@ VBlankHandler:
     ld      b, %00100000
     and     a, b
     jr      nz, .skipRight
-   ;call MovePlayerRight
+    call MovePlayerRight
     jr      .skipMove
 .skipRight
     ld      a, [wPlayerDirections]
