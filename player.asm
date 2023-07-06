@@ -6,6 +6,9 @@ InitPlayer:
     ld      [wPlayerPos+1], a
     xor     a, a ;Faster than ld a, 0
     ld      [wPlayerTimer], a
+    ld      a, 20
+    ld      [wPlayerDirections], a
+    ld      [wPrevPlayerDirections], a
     ret
 
 MovePlayerStart:
@@ -16,16 +19,20 @@ MovePlayerStart:
     ld      h, a
 
     ld      a, [wPlayerDirections]
-    ld      c, a ; Store for later as this is faster
-    and     a, $F0 ; store a as CCCC 0000
-    ld      a, b   ; store b as CCCC 0000
-    ld      a, c   ; restore a as CCCC PPPP
-    and     a, $0F ; store a as 0000 PPPP
-    swap    a      ; store a as PPPP 0000
-    cp      a, b   ; subract PPPP 0000 - CCCC 0000
+    ld      c, a
+    ld      b, a ; Store for later as this is faster
+    ld      a, [wPrevPlayerDirections]
+    cp      a, b  
     jr      z, .snakeGoingSameDirection
-    ld      a, 0 ; AHHHHH
-    jr      .snakeDirectionEnd ; Replace with snake differect direciton
+
+    ld      b, a
+    ld      a, [wPlayerDirections]
+
+    ; Work out flips
+    
+
+    ld      a, 5
+    jr     .snakeDirectionEnd
 .snakeGoingSameDirection
     ld      a, c
     and     a, $C0
@@ -48,6 +55,8 @@ MovePlayerEnd:
     ld      [wPlayerPos+1], a
     ld      a, b
     ld      [hl], a
+    ld      a, [wPlayerDirections]
+    ld      [wPrevPlayerDirections], a
     ret
 ; Work out a way to do wrapping here
 MovePlayerDown:
@@ -182,4 +191,6 @@ wPlayerPos:
 wPlayerTimer: 
     db
 wPlayerDirections: 
+    db
+wPrevPlayerDirections:
     db

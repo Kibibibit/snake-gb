@@ -30,8 +30,21 @@ VBlankHandler:
     ld      [wVBlankFlags], a
     
 .skipDMA
+
     ld      a, [wPlayerTimer]
-    ld      b, 1
+    add     a, 1
+    ld      [wPlayerTimer], a
+    
+    call    ReadJoypad ; Read joypad inputs
+    and     a, $F0 ;Zero out the buttons as we don't need them
+    cp      a, 0
+    jr      z, .finishedReadInput
+    ld      [wPlayerDirections], a ; Store player directions for next cycle
+
+.finishedReadInput
+
+    ld      a, [wPlayerTimer]
+    ld      b, 10
     cp      a, b
 
     jr      z, .startMove

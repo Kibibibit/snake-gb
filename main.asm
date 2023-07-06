@@ -90,24 +90,5 @@ AwaitVBlank:
 
 ; infinite loop till I work out what I'm doing
 MainLoop:
-    ld      a, [wPlayerTimer]
-    add     a, 1
-    ld      [wPlayerTimer], a
-    
-    call    ReadJoypad ; Read joypad inputs
-    and     a, $F0 ;Zero out the buttons as we don't need them
-    ld      c, a ;Store dpad directions for later
-    cp      a, 0
-    jr      z, .finishedReadInput
-    
-    ;based on input, set player direction/update previous direction
-    ld      a, [wPlayerDirections]
-    swap    a ; We store the previous direction in the lower 4 bits, so last cycles current direction is this cycles previous
-    and     a, $0F ;Zero out the current direction
-    or      a, c ;Update directions to include 
-    ld      [wPlayerDirections], a ; Store player directions for next cycle
-
-.finishedReadInput
-
     halt
     jr      MainLoop
