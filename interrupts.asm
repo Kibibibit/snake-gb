@@ -55,7 +55,7 @@ VBlankHandler:
 
 .move
     ld      a, [wPlayerDirections]
-    ld      b, %10000000
+    ld      b, PlayerDown
     and     a, b
     cp      a, b
     jr      nz, .skipDown
@@ -63,7 +63,7 @@ VBlankHandler:
     jr      .skipMove
 .skipDown
     ld      a, [wPlayerDirections]
-    ld      b, %01000000
+    ld      b, PlayerUp
     and     a, b
     cp      a, b
     jr      nz, .skipUp
@@ -71,19 +71,19 @@ VBlankHandler:
     jr      .skipMove
 .skipUp  
     ld      a, [wPlayerDirections]
-    ld      b, %00100000
-    and     a, b
-    jr      nz, .skipRight
-    call MovePlayerRight
-    jr      .skipMove
-.skipRight
-    ld      a, [wPlayerDirections]
-    ld      b, %00010000
+    ld      b, PlayerLeft
     and     a, b
     jr      nz, .skipLeft
-    call    MovePlayerLeft
+    call MovePlayerLeft
     jr      .skipMove
 .skipLeft
+    ld      a, [wPlayerDirections]
+    ld      b, PlayerRight
+    and     a, b
+    jr      nz, .skipRight
+    call    MovePlayerRight
+    jr      .skipMove
+.skipRight
 .skipMove
 
     ; Once the interrupt is done, we can go back to doing whatever it was before

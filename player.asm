@@ -28,7 +28,9 @@ MovePlayerStart:
     ld      b, a
     ld      a, [wPlayerDirections]
 
-    ; Work out flips
+    ; Check flip directions now
+    ; If going vertical -> previous direction handles hori flip
+    ; If going horizontal -> previous direction handles vertical flip
     
 
     ld      a, 5
@@ -45,7 +47,7 @@ MovePlayerStart:
 .snakeGoingLeftRight
     ld      a, 3
 .snakeDirectionEnd
-    ld      [hl], a ;Set the previous value to 0 - need to make this leave the snake trail instead
+    ld      [hl], a
     ret
 
 MovePlayerEnd:
@@ -66,7 +68,7 @@ MovePlayerDown:
     
     call    Add8To16
 
-    ld      de, $9A20
+    ld      de, PlayerMaxHeight
     call    Gt16
     cp      a, 1
     jr      z, .downTrue
@@ -74,11 +76,11 @@ MovePlayerDown:
 
 .downTrue
     ld      a, l ; save the column
-    and     a, $1F
-    add     a, $40 ; set lower byte to 4
+    and     a, ColumnMask
+    add     a, $40 ; set lower byte to 4 - Reconfirm this
     ld      l, a
 
-    ld      a, $98
+    ld      a, WrapDownRow
     ld      h, a
 .downFalse
     ld      b, 2
@@ -99,7 +101,7 @@ MovePlayerUp:
     
     call    Sub8From16
 
-    ld      de, $9833
+    ld      de, PlayerMinHeight
     ld      b, h ; ld bc, hl
     ld      c, l
     ld      h, d ; ld hl, de
@@ -115,9 +117,9 @@ MovePlayerUp:
     jr      .upFalse
 .upTrue
     ld      a, l
-    and     a, $1F
+    and     a, ColumnMask
     ld      l, a
-    ld      a, $9A
+    ld      a, WrapUpRow
     ld      h, a
 .upFalse
     ld      b, 2
