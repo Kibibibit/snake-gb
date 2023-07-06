@@ -132,13 +132,12 @@ MovePlayerRight:
 
     ld      a, l
     and     a, $1F
-    cp      a, $12
+    cp      a, $13
     jr      nc, .rightTrue
     jr      .rightFalse
 .rightTrue
-    ; Wrapping is being set wrong
     ld      a, l
-    or      a, $E0
+    and     a, $E0
     ld      l, a
     ld      a, $01
     or      a, l
