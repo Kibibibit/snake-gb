@@ -1,4 +1,5 @@
 INCLUDE "hardware.inc"
+INCLUDE "macros.inc"
 INCLUDE "interrupts.asm"
 INCLUDE "functions.asm"
 INCLUDE "inputs.asm"
@@ -7,6 +8,7 @@ INCLUDE "graphics.asm"
 INCLUDE "registers.asm"
 INCLUDE "level_data.asm"
 INCLUDE "player.asm"
+
 
 SECTION "Header", ROM0[$100]
     ; Make space for the nintendo header
@@ -94,10 +96,10 @@ MainLoop:
     
     call    ReadJoypad ; Read joypad inputs
     and     a, $F0 ;Zero out the buttons as we don't need them
-    ld      b, 0
-    cp      a, b
-    jr      z, .finishedReadInput
     ld      c, a ;Store dpad directions for later
+    cp      a, 0
+    jr      z, .finishedReadInput
+    
     ;based on input, set player direction/update previous direction
     ld      a, [wPlayerDirections]
     swap    a ; We store the previous direction in the lower 4 bits, so last cycles current direction is this cycles previous

@@ -9,12 +9,38 @@ InitPlayer:
     ret
 
 MovePlayerStart:
+
     ld      a, [wPlayerPos]
     ld      l, a
     ld      a, [wPlayerPos+1]
     ld      h, a
-    ld      [hl], 0 ;Set the previous value to 0
+
+    ld      a, [wPlayerDirections]
+    ld      c, a ; Store for later as this is faster
+    and     a, $F0 ; store a as CCCC 0000
+    ld      a, b   ; store b as CCCC 0000
+    ld      a, c   ; restore a as CCCC PPPP
+    and     a, $0F ; store a as 0000 PPPP
+    swap    a      ; store a as PPPP 0000
+    cp      a, b   ; subract PPPP 0000 - CCCC 0000
+    jr      z, .snakeGoingSameDirection
+    ld      a, 0 ; AHHHHH
+    jr      .snakeDirectionEnd ; Replace with snake differect direciton
+.snakeGoingSameDirection
+    ld      a, c
+    and     a, $C0
+    cp      a, 0
+    jr      nz,.snakeGoingUpDown
+    jr      .snakeGoingLeftRight
+.snakeGoingUpDown
+    ld      a, 4
+    jr      .snakeDirectionEnd
+.snakeGoingLeftRight
+    ld      a, 3
+.snakeDirectionEnd
+    ld      [hl], a ;Set the previous value to 0 - need to make this leave the snake trail instead
     ret
+
 MovePlayerEnd:
     ld      a, l
     ld      [wPlayerPos], a
@@ -49,13 +75,11 @@ MovePlayerDown:
     ld      b, 2
     call    MovePlayerEnd
     ; Set the orientation
-    ld      a, 1
-    ld      [rVBK], a
+    SetVBK1
     ld      a, [hl]
     or      a, $40
     ld      [hl], a
-    xor     a, a
-    ld      [rVBK], a
+    SetVBK0
 
     ret
 
@@ -89,13 +113,11 @@ MovePlayerUp:
 .upFalse
     ld      b, 2
     call    MovePlayerEnd
-    ld      a, 1
-    ld      [rVBK], a
+    SetVBK1
     ld      a, [hl]
     and     a, $BF
     ld      [hl], a
-    xor     a, a
-    ld      [rVBK], a
+    SetVBK0
     ret
 
 MovePlayerLeft:
@@ -116,13 +138,11 @@ MovePlayerLeft:
 .leftFalse
     ld      b, 1
     call    MovePlayerEnd
-    ld      a, 1
-    ld      [rVBK], a
+    SetVBK1
     ld      a, [hl]
     and     a, $DF
     ld      [hl], a
-    xor     a, a
-    ld      [rVBK], a
+    SetVBK0
     ret
 
 MovePlayerRight:
@@ -148,13 +168,11 @@ MovePlayerRight:
     ld      b, 1
     call    MovePlayerEnd
 
-    ld      a, 1
-    ld      [rVBK], a
+    SetVBK1
     ld      a, [hl]
     or      a, $20
     ld      [hl], a
-    xor     a, a
-    ld      [rVBK], a
+    SetVBK0
     ret
 
 

@@ -31,7 +31,7 @@ VBlankHandler:
     
 .skipDMA
     ld      a, [wPlayerTimer]
-    ld      b, 10
+    ld      b, 1
     cp      a, b
 
     jr      z, .startMove
