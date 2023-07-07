@@ -15,7 +15,7 @@ MovePlayer:
 .dontSaveMove
 
     ld      a, [wPlayerTimer]
-    dec     a,
+    dec     a
     cp      a, 0
     jr      z, .doMove
     ret
@@ -29,11 +29,11 @@ MovePlayer:
     ; Shunt all values in player lists one down
     ; Move all the Snake tiles down one
     ld      bc, wPlayerTilesEnd-wPlayerTiles ; Store the length of the lsit
-    ld      hl, wPlayerTiles+wPlayerTilesEnd ; Store the end of the list
+    ld      hl, wPlayerTilesEnd ; Store the end of the list
     call    PushFront16
 
     ld      bc, wPlayerAttrsEnd-wPlayerAttrs
-    ld      hl, wPlayerAttrs+wPlayerAttrsEnd
+    ld      hl, wPlayerAttrsEnd
     call    PushFront8
 
     ; Now everything is shunted, clear the entry of each list down to snake size
@@ -68,13 +68,13 @@ wPlayerSize:
     db     
 ; Allocated memory for the array of all tiles the player is in      
 wPlayerTiles:
-    ds      $3E, 0
+    ds      $3E
 wPlayerTilesEnd:
     ; These bytes is basically where garbage from the list shunting goes
-    ds      2, 0
+    ds      2
 
 wPlayerAttrs: ; Store as 0YX0 0SSS Y -> y flip, X -> x flip, SSS -> Sprite index
-    ds      $1F, 0
+    ds      $1F
 wPlayerAttrsEnd:
     ; Garbadge byte
     db

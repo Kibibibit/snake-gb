@@ -27,11 +27,6 @@ StartPoint:
     ld      hl, _OAMRAM
     call    Memclr
 
-    ; Clear OAM staging memory
-    ld      bc, OAM_SIZE
-    ld      hl, wOAMStagingPoint
-    call    Memclr
-
     ; Load in level data
     ld      de, LevelData
     ld      hl, TILEMAP_START
