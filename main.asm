@@ -53,6 +53,7 @@ StartPoint:
 
 
     ; Init the player here
+    call    InitPlayer
 
 
     ; Enable VBlank interrupts

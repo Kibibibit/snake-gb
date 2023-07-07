@@ -3,6 +3,7 @@ SECTION "Player", ROM0
 InitPlayer:
     ld      a, 2
     ld      [wPlayerSize], a
+    ret
 
 MovePlayer:
     ; Buffer input
