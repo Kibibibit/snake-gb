@@ -46,8 +46,7 @@ StartPoint:
     ld      bc, BgPalettesEnd-BgPalettes
     call    WriteBgPalettes
 
-
-    ; Init the player here
+    ; Set the player position, inital direction and all that
     call    InitPlayer
 
 
