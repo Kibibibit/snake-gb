@@ -1,198 +1,79 @@
 SECTION "Player", ROM0
+
 InitPlayer:
-    ld      a, $08
-    ld      [wPlayerPos], a
-    ld      a, $99
-    ld      [wPlayerPos+1], a
-    xor     a, a ;Faster than ld a, 0
-    ld      [wPlayerTimer], a
-    ld      a, 20
-    ld      [wPlayerDirections], a
-    ld      [wPrevPlayerDirections], a
-    ret
+    ld      a, 2
+    ld      [wPlayerSize], a
 
-MovePlayerStart:
-
-    ld      a, [wPlayerPos]
-    ld      l, a
-    ld      a, [wPlayerPos+1]
-    ld      h, a
-
-    ld      a, [wPlayerDirections]
-    ld      c, a
-    ld      b, a ; Store for later as this is faster
-    ld      a, [wPrevPlayerDirections]
-    cp      a, b  
-    jr      z, .snakeGoingSameDirection
-
-    ld      b, a
-    ld      a, [wPlayerDirections]
-
-    ; Check flip directions now
-    ; If going vertical -> previous direction handles hori flip
-    ; If going horizontal -> previous direction handles vertical flip
-    
-
-    ld      a, 5
-    jr     .snakeDirectionEnd
-.snakeGoingSameDirection
-    ld      a, c
-    and     a, $C0
+MovePlayer:
+    ; Buffer input
+    ld      a, [wButtonsPressed]
+    and     a, $F0
     cp      a, 0
-    jr      nz,.snakeGoingUpDown
-    jr      .snakeGoingLeftRight
-.snakeGoingUpDown
-    ld      a, 4
-    jr      .snakeDirectionEnd
-.snakeGoingLeftRight
-    ld      a, 3
-.snakeDirectionEnd
-    ld      [hl], a
-    ret
+    jr      z, .dontSaveMove ; If they didn't hit anything, we just save keep the previous move
+    ld      [wPlayerDir], a
+.dontSaveMove
 
-MovePlayerEnd:
-    ld      a, l
-    ld      [wPlayerPos], a
-    ld      a, h
-    ld      [wPlayerPos+1], a
-    ld      a, b
-    ld      [hl], a
-    ld      a, [wPlayerDirections]
-    ld      [wPrevPlayerDirections], a
+    ld      a, [wPlayerTimer]
+    dec     a,
+    cp      a, 0
+    jr      z, .doMove
     ret
-; Work out a way to do wrapping here
-MovePlayerDown:
-    call    MovePlayerStart
+.doMove
+    ; Reset player timer
+    ld      a, 10
+    ld      [wPlayerTimer], a
+
+    ; TODO: update the player's head to be a body segment
+
+    ; Shunt all values in player lists one down
+    ; Move all the Snake tiles down one
+    ld      bc, wPlayerTilesEnd-wPlayerTiles ; Store the length of the lsit
+    ld      hl, wPlayerTiles+wPlayerTilesEnd ; Store the end of the list
+    call    PushFront16
+
+    ld      bc, wPlayerAttrsEnd-wPlayerAttrs
+    ld      hl, wPlayerAttrs+wPlayerAttrsEnd
+    call    PushFront8
+
+    ; Now everything is shunted, clear the entry of each list down to snake size
+    ; loop through till you hit snake size, then clear 0 until you hit end of list
+
+
+    ; Now insert the player's head back into the empty space provided by the shunt
+
+
+    ; Current direction becomes previous direction
+    ; Move all snake attributes down one
+    ld      a, [wPlayerDir]
+    ld      [wPlayerPrevDir], a
     
-    ld      a, $20 ; $20 is one row down
-    
-    call    Add8To16
 
-    ld      de, PlayerMaxHeight
-    call    Gt16
-    cp      a, 1
-    jr      z, .downTrue
-    jr      .downFalse
-
-.downTrue
-    ld      a, l ; save the column
-    and     a, ColumnMask
-    add     a, $40 ; set lower byte to 4 - Reconfirm this
-    ld      l, a
-
-    ld      a, WrapDownRow
-    ld      h, a
-.downFalse
-    ld      b, 2
-    call    MovePlayerEnd
-    ; Set the orientation
-    SetVBK1
-    ld      a, [hl]
-    or      a, $40
-    ld      [hl], a
-    SetVBK0
 
     ret
 
-MovePlayerUp:
-    call    MovePlayerStart
-
-    ld      a, $20
-    
-    call    Sub8From16
-
-    ld      de, PlayerMinHeight
-    ld      b, h ; ld bc, hl
-    ld      c, l
-    ld      h, d ; ld hl, de
-    ld      l, e
-    ld      d, b ; ld de, bc
-    ld      e, c
-
-    call    Gt16
-    ld      h, d
-    ld      l, e
-    cp      a, 1
-    jr      z, .upTrue
-    jr      .upFalse
-.upTrue
-    ld      a, l
-    and     a, ColumnMask
-    ld      l, a
-    ld      a, WrapUpRow
-    ld      h, a
-.upFalse
-    ld      b, 2
-    call    MovePlayerEnd
-    SetVBK1
-    ld      a, [hl]
-    and     a, $BF
-    ld      [hl], a
-    SetVBK0
-    ret
-
-MovePlayerLeft:
-    call    MovePlayerStart
-
-    dec     hl
-
-    ld      a, l
-    and     a, $1F ; This is the value we need to check
-    ld      b, $0
-    cp      a, b
-    jr      z, .leftTrue
-    jr      .leftFalse
-.leftTrue
-    ld      a, $12
-    or      a, l
-    ld      l, a
-.leftFalse
-    ld      b, 1
-    call    MovePlayerEnd
-    SetVBK1
-    ld      a, [hl]
-    and     a, $DF
-    ld      [hl], a
-    SetVBK0
-    ret
-
-MovePlayerRight:
-    call    MovePlayerStart
-
-    inc     hl
-
-    ld      a, l
-    and     a, $1F
-    cp      a, $13
-    jr      nc, .rightTrue
-    jr      .rightFalse
-.rightTrue
-    ld      a, l
-    and     a, $E0
-    ld      l, a
-    ld      a, $01
-    or      a, l
-    ld      l, a
-
-.rightFalse
-
-    ld      b, 1
-    call    MovePlayerEnd
-
-    SetVBK1
-    ld      a, [hl]
-    or      a, $20
-    ld      [hl], a
-    SetVBK0
-    ret
 
 
 SECTION "Player Variables", WRAM0
-wPlayerPos: 
-    ds      2
-wPlayerTimer: 
+wPlayerTimer:
     db
-wPlayerDirections: 
+; What direction is the player facing this frame
+wPlayerDir:
     db
-wPrevPlayerDirections:
+; What direction did the player face last frame
+wPlayerPrevDir:
+    db    
+; Stores the length of wPlayerAttrs 
+wPlayerSize:
+    db     
+; Allocated memory for the array of all tiles the player is in      
+wPlayerTiles:
+    ds      $3E, 0
+wPlayerTilesEnd:
+    ; These bytes is basically where garbage from the list shunting goes
+    ds      2, 0
+
+wPlayerAttrs: ; Store as 0YX0 0SSS Y -> y flip, X -> x flip, SSS -> Sprite index
+    ds      $1F, 0
+wPlayerAttrsEnd:
+    ; Garbadge byte
     db

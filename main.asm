@@ -1,94 +1,74 @@
 INCLUDE "hardware.inc"
+INCLUDE "constants.inc"
 INCLUDE "macros.inc"
-INCLUDE "interrupts.asm"
 INCLUDE "functions.asm"
-INCLUDE "inputs.asm"
-INCLUDE "dma_transfer.asm"
 INCLUDE "graphics.asm"
-INCLUDE "registers.asm"
 INCLUDE "level_data.asm"
+INCLUDE "inputs.asm"
 INCLUDE "player.asm"
 
-
 SECTION "Header", ROM0[$100]
-    ; Make space for the nintendo header
-    jp      EntryPoint
-    ds      $150 - @, 0
+    jp      StartPoint
+    ds      HEADER_SIZE - @, 0
 
+StartPoint:
+    DisableAudio
+    AwaitVBlank            ; Wait for a blank before turning off the LCD
+    DisableLCD             ; While the LCD is off we can do whatever
 
-EntryPoint:
-    ; Shut down audio circuitry for now as I don't know how to use it
-    xor     a, a
-    ld      [rNR52], a
-
-    ;Copy in the DMA transfer routine to HRAM
-    call    CopyDMARoutine
-
-; Wait for vblank before turning off the lcd. We don't want to use interrupts yet as it'll mess with the memory load
-AwaitVBlank:
-    ld      a, [rLY]       ; Copy the current (Scan line I think?) into `a`
-    cp      $90            ; Compare to $90, or the 144th scanline (off the bottom of the screen)
-    jp      c, AwaitVBlank ; If this underflows, we're not yet vblanking
-
-    ; Turn off the lcd by writing 0 to rLCDC
-    xor     a, a
-    ld      [rLCDC], a
-
-    ; Start copying tiles into vram
+    ; Load all the tiles into the tile memory
     ld      de, SnakeTiles
-    ld      hl, $9010 ; Change this to background tiles once game logic is working
+    ld      hl, TILES_START
     ld      bc, SnakeTilesEnd - SnakeTiles
     call    Memcpy
 
-    ; Once tile copying is done, clear junk from the OAM
-    ld      bc, $00A0 ; OAM memory is 160 bytes long
+    ; Clear junk from OAM
+    ld      bc, OAM_SIZE
     ld      hl, _OAMRAM
     call    Memclr
 
-    ld      bc, $00A0
+    ; Clear OAM staging memory
+    ld      bc, OAM_SIZE
     ld      hl, wOAMStagingPoint
     call    Memclr
 
+    ; Load in level data
     ld      de, LevelData
-    ld      hl, $9800
+    ld      hl, TILEMAP_START
     ld      bc, LevelDataEnd - LevelData
     call    Memcpy
 
-    ld      a, 1
-    ldh     [rVBK], a
+    ; Load in level colour/flip maps
+    SetVBK1
     ld      de, AttributeData
-    ld      hl, $9800
+    ld      hl, TILEMAP_START
     ld      bc, AttributeDataEnd - AttributeData
     call    Memcpy
-
-    xor     a, a
-    ldh     [rVBK], a
+    SetVBK0
 
     ; Load in palettes
     ld      de, BgPalettes
     ld      bc, BgPalettesEnd-BgPalettes
     call    WriteBgPalettes
 
-    call    InitPlayer
 
-    ; Tell the vblank interrupt that we want to do a DMA transfer
-    ld      a, regDMAWrite
-    ld      [wVBlankFlags], a
+    ; Init the player here
 
-    ; Enable LCD
-    ld      a, LCDCF_ON | LCDCF_BGON | LCDCF_OBJON
+
+    ; Enable VBlank interrupts
+    ld      a, IEF_VBLANK
+    ldh     [rIE], a
+    xor     a, a
+    ldh     [rIF], a
+    ei
+
+
+    ; Turn on the LCD
+    ld      a, LCDCF_ON | LCDCF_BGON
     ld      [rLCDC], a
 
-    ; Now that we have the data loaded, we want to enable vblank interrupts
-    ld      a, IEF_VBLANK ; IEF_VBLANK sets the bit for vblank interrupts
-    ldh     [rIE], a      ; IE stores all the enabled interrupt routines
-    xor     a, a          ; Faster than ld a, 0 :)
-    ldh     [rIF], a      ; We want to set rIF to 0 otherwise interrupts might activate prematurely
-    ei                 ; Enable interrupts
-
-    
-
-; infinite loop till I work out what I'm doing
-MainLoop:
+.mainLoop
+    call    ReadJoypad
+    call    MovePlayer
     halt
-    jr      MainLoop
+    jr      .mainLoop
